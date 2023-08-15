@@ -231,7 +231,7 @@ const Ong = {
                 canvas.drawTriangle(x, y, x + size, y, x + size / 2, y + size / 2);
                 this.draw(canvas, x, y, subTriangleSize);
                 this.draw(canvas, x + size, y, subTriangleSize);
-                this.draw(canvas, x + size / 2, y + size 
+                this.draw(canvas, x + size / 2, y + size / 2, subTriangleSize);
               } else {
                   canvas.drawPoint(x, y);
               }
@@ -267,5 +267,3 @@ const Ong = {
     console.log(result);
 
     Ong.main();
-
-

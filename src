@@ -107,7 +107,6 @@ const Evaluator = function () {
     }
   };
 };
-
 const Specializer = function () {
   this.results = {};
 
@@ -125,51 +124,16 @@ const Specializer = function () {
   };
 };
 
-function Trine(input, program, output) {
-  this.input = input;
-  this.program = program;
-  this.output = output;
-
-  this.apply = function (fractal, args) {
-    const result = this.program(fractal, args);
-    if (result.apply !== undefined) {
-      return Ong.newTrine(this.input, result.apply, result.output)(fractal, args);
-    } else {
-      return result;
-    }
-  };
-
-  this.isQuine = function () {
-    return this.program(this) === this;
-  };
-
-  this.isPerceptron = function () {
-    const weights = [];
-    const biases = [];
-    for (const arg of args) {
-      if (arg.isQuine()) {
-        weights.push(1);
-      } else if (arg.isPerceptron()) {
-        weights.push(arg.weights[0]);
-        biases.push(arg.biases[0]);
-      } else {
-        return false;
-      }
-    }
-    return this.program(this) === Ong.newPerceptron(weights, biases);
-  };
-}
-
 // Ong framework
 const Ong = {
     newFractal: (name, apply) => new Fractal(name, apply),
 
     evalFractal: (fractal, args) => {
-        if (fractal.apply === undefined) {
-            return fractal;
-        } else {
-            return fractal.apply(fractal, args);
-        }
+      if (fractal.apply === undefined) {
+        return fractal;
+      } else {
+        return fractal.apply(fractal, args);
+      }
     },
 
     list: (args) => {
@@ -267,39 +231,41 @@ const Ong = {
                 canvas.drawTriangle(x, y, x + size, y, x + size / 2, y + size / 2);
                 this.draw(canvas, x, y, subTriangleSize);
                 this.draw(canvas, x + size, y, subTriangleSize);
-                this.draw(canvas, x + size / 2, y + size / 2, subTriangleSize);
-            } else {
-                canvas.drawPoint(x, y);
-            }
-        };
-    }
-}
+                this.draw(canvas, x + size / 2, y + size 
+              } else {
+                  canvas.drawPoint(x, y);
+              }
+          };
+      }
+    },
+
     Ong.SierpinskiTrine = SierpinskiTrine;
 
-    interpretProgram: (string) => {
+    Ong.interpretProgram: (string) => {
         const fractal = Ong.lispParse(string);
         return Ong.evalFractal(fractal);
     },
-Ong.prompt = async function () {
-  const promptValue = null;
 
-  if (promptValue) {
-    const result = Ong.interpretProgram(promptValue);
+    Ong.prompt = async function () {
+      const promptValue = await prompt("Enter a program: ");
+
+      const fractal = Ong.lispParse(promptValue);
+
+      const result = Ong.evalFractal(fractal);
+      console.log(result);
+    };
+
+    Ong.main = async function () {
+      await Ong.prompt();
+    };
+
+    const promptValue = await prompt("Enter a program: ");
+
+    const fractal = Ong.lispParse(promptValue);
+
+    const result = Ong.evalFractal(fractal);
     console.log(result);
-  }
-};
 
-Ong.main = async function () {
-  await Ong.prompt();
-};
-
-const promptValue = await prompt("Enter a program: ");
-
-const fractal = Ong.lispParse(promptValue);
-
-const result = Ong.evalFractal(fractal);
-console.log(result);
-
-Ong.main();
+    Ong.main();
 
 

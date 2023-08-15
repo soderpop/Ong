@@ -293,11 +293,13 @@ Ong.main = async function () {
   await Ong.prompt();
 };
 
-Ong.main();
-
 const promptValue = await prompt("Enter a program: ");
 
 const fractal = Ong.lispParse(promptValue);
 
 const result = Ong.evalFractal(fractal);
 console.log(result);
+
+Ong.main();
+
+

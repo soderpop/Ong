@@ -1,0 +1,294 @@
+//Copyright Alexander Edward Brygider August 14th 2023 (All rights reserved worldwide)
+
+function SierpinskiTrine(input, program, output) {
+  this.input = input;
+  this.program = program;
+  this.output = output;
+
+  this.draw = function (canvas, x, y, size) {
+    const subTriangleSize = size / 2;
+
+    if (size > 1) {
+      canvas.drawTriangle(x, y, x + size, y, x + size / 2, y + size / 2);
+      this.draw(canvas, x, y, subTriangleSize);
+      this.draw(canvas, x + size, y, subTriangleSize);
+      this.draw(canvas, x + size / 2, y + size / 2, subTriangleSize);
+    } else {
+      canvas.drawPoint(x, y);
+    }
+  };
+}
+
+const memoize = (function () {
+  const cache = {};
+
+  return function (fn) {
+    return function (...args) {
+      if (cache[args]) {
+        return cache[args];
+      } else {
+        const result = fn(...args);
+        cache[args] = result;
+        return result;
+      }
+    };
+  };
+})();
+
+const metagraph = function (nodes) {
+  const graph = new Map();
+
+  for (const node of nodes) {
+    graph.set(node.name, node);
+    for (const edge of node.edges) {
+      graph.set(edge.name, edge);
+    }
+  }
+
+  return graph;
+};
+
+const abstractInterpretation = function (program) {
+  const analyzer = new Analyzer();
+
+  analyzer.visit(program);
+
+  return analyzer.getResults();
+};
+
+const partialEvaluation = function (program, assumptions) {
+  const evaluator = new Evaluator();
+
+  evaluator.visit(program, assumptions);
+
+  return evaluator.getResults();
+};
+
+const programSpecialization = function (program, input) {
+  const specializer = new Specializer();
+
+  specializer.visit(program, input);
+
+  return specializer.getResults();
+};
+
+const Analyzer = function () {
+  this.results = {};
+
+  this.visit = function (node) {
+    if (node.name in this.results) {
+      return this.results[node.name];
+    } else {
+      const results = {};
+      for (const child of node.children) {
+        results[child.name] = this.visit(child);
+      }
+      this.results[node.name] = results;
+      return results;
+    }
+  };
+};
+
+const Evaluator = function () {
+  this.results = {};
+
+  this.visit = function (node, assumptions) {
+    if (node.name in this.results) {
+      return this.results[node.name];
+    } else {
+      const results = {};
+      for (const child of node.children) {
+        results[child.name] = this.visit(child, assumptions);
+      }
+      this.results[node.name] = assumptions[node.name] ? results[node.name] : node.value;
+      return results;
+    }
+  };
+};
+
+const Specializer = function () {
+  this.results = {};
+
+  this.visit = function (node, input) {
+    if (node.name in this.results) {
+      return this.results[node.name];
+    } else {
+      const results = {};
+      for (const child of node.children) {
+        results[child.name] = this.visit(child, input);
+      }
+      this.results[node.name] = results[node.name].map(value => value + input);
+      return results;
+    }
+  };
+};
+
+function Trine(input, program, output) {
+  this.input = input;
+  this.program = program;
+  this.output = output;
+
+  this.apply = function (fractal, args) {
+    const result = this.program(fractal, args);
+    if (result.apply !== undefined) {
+      return Ong.newTrine(this.input, result.apply, result.output)(fractal, args);
+    } else {
+      return result;
+    }
+  };
+
+  this.isQuine = function () {
+    return this.program(this) === this;
+  };
+
+  this.isPerceptron = function () {
+    const weights = [];
+    const biases = [];
+    for (const arg of args) {
+      if (arg.isQuine()) {
+        weights.push(1);
+      } else if (arg.isPerceptron()) {
+        weights.push(arg.weights[0]);
+        biases.push(arg.biases[0]);
+      } else {
+        return false;
+      }
+    }
+    return this.program(this) === Ong.newPerceptron(weights, biases);
+  };
+}
+
+// Ong framework
+const Ong = {
+    newFractal: (name, apply) => new Fractal(name, apply),
+
+    evalFractal: (fractal, args) => {
+        if (fractal.apply === undefined) {
+            return fractal;
+        } else {
+            return fractal.apply(fractal, args);
+        }
+    },
+
+    list: (args) => {
+        return new Fractal("list", (fractal) => {
+            const result = [];
+            for (const arg of args) {
+                result.push(Ong.evalFractal(arg));
+            }
+            return result;
+        });
+    },
+
+    newTrine: (input, program, output) => {
+        return new Trine(input, program, output);
+    },
+
+    lispParse: (string) => {
+        const tokens = string.split(" ");
+        const fractal = Ong.newFractal(tokens[0], undefined);
+
+        for (let i = 1; i < tokens.length; i++) {
+            fractal.args.push(Ong.lispParse(tokens[i]));
+        }
+
+        return fractal;
+    },
+
+    optimize: (program) => {
+        if (program.apply === undefined) {
+            return program;
+        } else {
+            const optimizedBody = memoize(program.body);
+
+            return Ong.newTrine(
+                "self",
+                function (fractal) {
+                    return program.apply(fractal, optimizedBody);
+                },
+                "optimized"
+            );
+        }
+    },
+
+    createNetwork: (program) => {
+        if (program.apply === undefined) {
+            return program;
+        } else {
+            const network = memoize(program.body);
+
+            return Ong.newTrine(
+                "self",
+                function (fractal) {
+                    const results = [];
+                    for (const fractalArg of network.args) {
+                        results.push(program.apply(fractal, fractalArg));
+                    }
+                    return results;
+                },
+                "network"
+            );
+        }
+    },
+
+    newProgram: (fractal) => {
+        return Ong.newTrine(
+            "self",
+            function (fractal) {
+                const program = Ong.lispParse(fractal.output);
+                return Ong.newFractal(program);
+            },
+            "program"
+        );
+    },                                                                                                                        
+    selfOptimize: function (fractal) {
+        const program = Ong.lispParse(fractal.output);
+        const optimizedProgram = memoize(program);
+        return Ong.newTrine(
+            "self",
+            function (fractal) {
+                return Ong.newFractal(optimizedProgram);
+            },
+            "optimized"
+        );
+    },
+
+    SierpinskiTrine: function (input, program, output) {
+        this.input = input;
+        this.program = program;
+        this.output = output;
+
+        this.draw = function (canvas, x, y, size) {
+            const subTriangleSize = size / 2;
+
+            if (size > 1) {
+                canvas.drawTriangle(x, y, x + size, y, x + size / 2, y + size / 2);
+                this.draw(canvas, x, y, subTriangleSize);
+                this.draw(canvas, x + size, y, subTriangleSize);
+                this.draw(canvas, x + size / 2, y + size / 2, subTriangleSize);
+            } else {
+                canvas.drawPoint(x, y);
+            }
+        };
+    }
+}
+    Ong.SierpinskiTrine = SierpinskiTrine;
+
+    interpretProgram: (string) => {
+        const fractal = Ong.lispParse(string);
+        return Ong.evalFractal(fractal);
+    },
+Ong.prompt = async function () {
+  const promptValue = null;
+
+  if (promptValue) {
+    const result = Ong.interpretProgram(promptValue);
+    console.log(result);
+  }
+};
+
+Ong.main = async function () {
+  await Ong.prompt();
+};
+
+Ong.main();

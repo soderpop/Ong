@@ -1,5 +1,9 @@
 //Copyright Alexander Edward Brygider August 14th 2023 (All rights reserved worldwide)
 
+// Ong programming language
+
+// Ong is a programming language that is based on fractals. It is a self optimizing, Fractal based, programming language. It is currently in the process of being developed. Our goal is to to create the world's first self optimizing, Fractal based, programming language. Copywrite Alexander Edward Brygider August 14th 2023 (All rights reserved worldwide)
+
 console.log("Welcome to the Ong programming language! We are currently in the process of developing this early access language. Please check back later for updates. The Ong programming language is an early stage programming language. It is currently in the process of being developed. Our goal is to to create the world's first self optimizing, Fractal based, programming language. Copywrite Alexander Edward Brygider August 14th 2023 (All rights reserved worldwide)");
 
 function SierpinskiTrine(input, program, output) {
@@ -237,33 +241,174 @@ const Ong = {
               }
           };
       }
-    },
+};
 
-    Ong.SierpinskiTrine = SierpinskiTrine;
+// Ong fractal
+const Fractal = function (name, apply) {
+    this.name = name;
+    this.apply = apply;
+    this.args = [];
+}
 
-    Ong.interpretProgram: (string) => {
-        const fractal = Ong.lispParse(string);
-        return Ong.evalFractal(fractal);
-    },
+// Ong trine
+const Trine = function (input, program, output) {
+    this.input = input;
+    this.program = program;
+    this.output = output;
+}
 
-    Ong.prompt = async function () {
-      const promptValue = await prompt("Enter a program: ");
+// Ong n dimensional canvas:
+const NDimensionalCanvas = function (dimension) {
+    this.dimension = dimension;
+    this.points = [];
 
-      const fractal = Ong.lispParse(promptValue);
-
-      const result = Ong.evalFractal(fractal);
-      console.log(result);
+    this.drawPoint = function (...args) {
+        this.points.push(args);
     };
 
-    Ong.main = async function () {
-      await Ong.prompt();
+    this.drawTriangle = function (...args) {
+        this.points.push(args);
+    };
+}
+
+// Ong 2 dimensional canvas:
+const TwoDimensionalCanvas = function () {
+    NDimensionalCanvas.call(this, 2);
+}
+
+// Ong 3 dimensional canvas:
+const ThreeDimensionalCanvas = function () {
+    NDimensionalCanvas.call(this, 3);
+}
+
+// Ong 4 dimensional canvas:
+const FourDimensionalCanvas = function () {
+    NDimensionalCanvas.call(this, 4);
+}
+
+// allow user to use the Ong programming language in the browser:
+const OngBrowser = function () {
+    this.canvas = new NDimensionalCanvas();
+    this.fractals = [];
+    this.trines = [];
+
+    this.addFractal = function (fractal) {
+        this.fractals.push(fractal);
     };
 
-    const promptValue = await prompt("Enter a program: ");
+    this.addTrine = function (trine) {
+        this.trines.push(trine);
+    };
 
-    const fractal = Ong.lispParse(promptValue);
+    this.draw = function () {
+        for (const trine of this.trines) {
+            const fractal = this.fractals[trine.input];
+            const program = this.fractals[trine.program];
+            const output = this.fractals[trine.output];
 
-    const result = Ong.evalFractal(fractal);
-    console.log(result);
+            const programResult = program.apply(fractal);
+            const outputResult = output.apply(programResult);
 
-    Ong.main();
+            outputResult.draw(this.canvas);
+        }
+    };
+}
+
+// Ong 2 dimensional browser:
+const TwoDimensionalBrowser = function () {
+    OngBrowser.call(this);
+
+    this.canvas = new TwoDimensionalCanvas();
+
+    this.draw = function () {
+        for (const trine of this.trines) {
+            const fractal = this.fractals[trine.input];
+            const program = this.fractals[trine.program];
+            const output = this.fractals[trine.output];
+
+            const programResult = program.apply(fractal);
+            const outputResult = output.apply(programResult);
+
+            outputResult.draw(this.canvas);
+        }
+    };
+}
+
+// Ong 3 dimensional browser:
+const ThreeDimensionalBrowser = function () {
+    OngBrowser.call(this);
+
+    this.canvas = new ThreeDimensionalCanvas();
+
+    this.draw = function () {
+        for (const trine of this.trines) {
+            const fractal = this.fractals[trine.input];
+            const program = this.fractals[trine.program];
+            const output = this.fractals[trine.output];
+
+            const programResult = program.apply(fractal);
+            const outputResult = output.apply(programResult);
+
+            outputResult.draw(this.canvas);
+        }
+    };
+
+}
+
+// Ong 4 dimensional browser:
+const FourDimensionalBrowser = function () {
+    
+    OngBrowser.call(this);
+
+    this.canvas = new FourDimensionalCanvas();
+
+    this.draw = function () {
+        for (const trine of this.trines) {
+            const fractal = this.fractals[trine.input];
+            const program = this.fractals[trine.program];
+            const output = this.fractals[trine.output];
+
+            const programResult = program.apply(fractal);
+            const outputResult = output.apply(programResult);
+
+            outputResult.draw(this.canvas);
+        }
+    }
+
+//create syntax for Ong programming language so that it uses lisp syntax:
+
+// Ong lisp syntax:
+const OngLispSyntax = function () {
+    this.parse = function (string) {
+        const tokens = string.split(" ");
+        const fractal = Ong.newFractal(tokens[0], undefined);
+
+        for (let i = 1; i < tokens.length; i++) {
+            fractal.args.push(Ong.lispParse(tokens[i]));
+        }
+
+        return fractal;
+    };
+}
+
+//ask user to input a program in the Ong programming language:
+}
+
+
+
+
+    // Ong syntax explanation:
+    const OngSyntaxExplanation = function () {
+        console.log("for ease of use the Ong Programming language is designed to have its syntax be similar to that of the Lisp programming language. The Ong programming language is a self optimizing, Fractal based, programming language. What this means is that the Ong programming language is a programming language that is based on fractals. Why is this important? Because Fractals allow for the Ong programming language to easily optimize itself. This means that the Ong programming language is a self optimizing, Fractal based, programming language. Copywrite Alexander Edward Brygider August 14th 2023 (All rights reserved worldwide)");
+    }
+
+//main function:
+const main = function () {
+    const canvas = new TwoDimensionalCanvas();
+    const sierpinskiTrine = new SierpinskiTrine("self", "self", "self");
+    sierpinskiTrine.draw(canvas, 0, 0, 512);
+};
+
+
+//run main function:
+main();
